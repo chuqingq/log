@@ -9,12 +9,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type Level = logrus.Level
+
 type Options struct {
 	Flags      int // 尽量用默认值
 	FIFO       string
 	DB         string
 	CountLimit int
-	Level      uint32
+	Level      Level
 }
 
 type Logger struct {
@@ -29,7 +31,7 @@ func New(options Options) (*Logger, error) {
 	var logger Logger
 	// default
 	if options.Level == 0 {
-		options.Level = uint32(logrus.InfoLevel)
+		options.Level = logrus.InfoLevel
 	}
 	if options.FIFO != "" {
 
@@ -60,7 +62,8 @@ func (l *Logger) Write(p []byte) (int, error) {
 			if l.db != nil {
 				l.db.Close()
 			}
-			// TODO backup db
+			// backup db
+			os.Rename(l.options.DB, l.options.DB+".bak")
 			// reopen db
 			var err error
 			l.db, err = os.OpenFile(l.options.DB, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
@@ -75,7 +78,9 @@ func (l *Logger) Write(p []byte) (int, error) {
 		}
 	}
 	// write
-	l.fifo.Write(p)
+	if l.fifo != nil {
+		l.fifo.Write(p)
+	}
 	n, err := l.db.Write(p)
 	return n, err
 }
@@ -86,6 +91,7 @@ func (l *Logger) Write(p []byte) (int, error) {
 // }
 
 type Fields = logrus.Fields
+type Field = map[string]interface{}
 
 const (
 	LevelDebug = logrus.DebugLevel
