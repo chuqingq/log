@@ -6,17 +6,19 @@ import (
 	"os"
 
 	"github.com/chuqingq/logondemand"
+	"github.com/chuqingq/mrpc"
 	"github.com/sirupsen/logrus"
 )
 
 type Level = logrus.Level
 
 type Options struct {
-	Flags      int // 尽量用默认值
-	FIFO       string
-	DB         string
-	CountLimit int
-	Level      Level
+	Flags        int // 尽量用默认值
+	FIFO         string
+	DB           string
+	CountLimit   int
+	Level        Level
+	RemoteServer string // remote log server
 }
 
 type Logger struct {
@@ -24,6 +26,7 @@ type Logger struct {
 	fifo    io.WriteCloser
 	db      io.WriteCloser
 	count   int
+	rpc     *mrpc.RPC
 	*logrus.Logger
 }
 
@@ -46,6 +49,10 @@ func New(options Options) (*Logger, error) {
 		options.CountLimit = 10000
 		logger.count = options.CountLimit
 	}
+	// remote logger
+	if options.RemoteServer != "" {
+		logger.rpc = mrpc.NewRPC()
+	}
 	logger.options = options
 	logger.Logger = &logrus.Logger{
 		Out:       &logger,
@@ -56,6 +63,9 @@ func New(options Options) (*Logger, error) {
 }
 
 func (l *Logger) Write(p []byte) (int, error) {
+	if l.rpc != nil {
+		l.rpc.Call(l.options.RemoteServer, "Server.Write", p, &Reply{}) // TODO async
+	}
 	if l.options.CountLimit != 0 {
 		if l.count == 0 {
 			// 关闭db
@@ -81,8 +91,11 @@ func (l *Logger) Write(p []byte) (int, error) {
 	if l.fifo != nil {
 		l.fifo.Write(p)
 	}
-	n, err := l.db.Write(p)
-	return n, err
+	if l.db != nil {
+		n, err := l.db.Write(p)
+		return n, err
+	}
+	return 0, nil
 }
 
 // func (l *Logger) WithFields(map[string]interface{}) *Logger {
