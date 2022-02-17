@@ -62,6 +62,18 @@ func New(options Options) (*Logger, error) {
 	return &logger, nil
 }
 
+func (l *Logger) Close() {
+	if l.fifo != nil {
+		l.fifo.Close()
+	}
+	if l.db != nil {
+		l.db.Close()
+	}
+	if l.rpc != nil {
+		l.rpc.Close()
+	}
+}
+
 func (l *Logger) Write(p []byte) (int, error) {
 	if l.rpc != nil {
 		l.rpc.Call(l.options.RemoteServer, "Server.Write", p, &Reply{}) // TODO async

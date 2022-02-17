@@ -19,6 +19,7 @@ func TestLog(t *testing.T) {
 	if err != nil {
 		t.Fatalf("New error: %v", err)
 	}
+	defer logger.Close()
 	// level
 	logger.WithFields(Fields{"module": "my_module", "version": "my_version1"}).Errorf("error: %v", "1")
 	logger.WithFields(Fields{"module": "my_module1", "version": "my_version"}).Warnf("error: %v", "2")
@@ -62,6 +63,7 @@ func TestRemote(t *testing.T) {
 	if err != nil {
 		t.Fatalf("New error: %v", err)
 	}
+	defer logger.Close()
 	// level
 	logger.WithFields(Fields{"module": "my_module", "version": "my_version1"}).Errorf("error: %v", "1")
 	logger.WithFields(Fields{"module": "my_module1", "version": "my_version"}).Warnf("error: %v", "2")
