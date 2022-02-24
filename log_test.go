@@ -48,6 +48,7 @@ func TestRemote(t *testing.T) {
 	localLogClient := "locallogclient-1"
 	dbname := localLogClient
 	defer os.Remove(dbname)
+	defer os.Remove(dbname + ".bak")
 	// start remote server
 	server, err := NewLogServer(remoteLogServer)
 	if err != nil {
