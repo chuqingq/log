@@ -110,13 +110,9 @@ func (l *Logger) Write(p []byte) (int, error) {
 	return 0, nil
 }
 
-// func (l *Logger) WithFields(map[string]interface{}) *Logger {
-// 	// TODO 是一次性的，还是持久的？
-// 	return l
-// }
+// func (l *Logger) WithFields(map[string]interface{}) *Logger
 
 type Fields = logrus.Fields
-type Field = map[string]interface{}
 
 const (
 	LevelDebug = logrus.DebugLevel
