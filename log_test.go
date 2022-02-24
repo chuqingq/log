@@ -7,11 +7,11 @@ import (
 
 func TestLog(t *testing.T) {
 	dbname := "test_log.db"
-	defer os.Remove(dbname)
+	// defer os.Remove(dbname)
 	// start
 	options := Options{
-		FIFO:       "test_log.fifo",
-		DB:         dbname,
+		Name: "test_log",
+		// DB:         dbname,
 		CountLimit: 1000,
 		Level:      LevelError,
 	}
@@ -44,18 +44,19 @@ func TestLog(t *testing.T) {
 }
 
 func TestRemote(t *testing.T) {
-	remoteLogServer := "remote-logger-1"
-	dbname := "remote-log.db"
+	remoteLogServer := "remotelogserver-1"
+	localLogClient := "locallogclient-1"
+	dbname := localLogClient
 	defer os.Remove(dbname)
 	// start remote server
-	server := &Server{
-		Name: remoteLogServer,
-		File: dbname,
+	server, err := NewLogServer(remoteLogServer)
+	if err != nil {
+		t.Fatalf("NewLogServer error: %v", err)
 	}
-	server.Start()
 	defer server.Stop()
 	// client
 	options := Options{
+		Name:         localLogClient,
 		RemoteServer: remoteLogServer,
 		Level:        LevelError,
 	}

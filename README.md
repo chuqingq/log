@@ -58,3 +58,11 @@ func TestLog(t *testing.T) {
 {"level":"error","module":"my_module","msg":"error: 1","time":"2022-02-15T16:44:47+08:00","version":"my_version1"}
 {"level":"error","module":"my_module1","msg":"error: 3","time":"2022-02-15T16:44:47+08:00","version":"my_version"}
 ```
+
+# TODO
+
+[x] logondemand模式需要确保任何级别均可查看
+[x] 远程模式：区分客户端，为不同客户端保存不同日志文件
+[x] 无需写入到本地文件（暂不开放）
+[ ] 用test hook做测试
+[ ] count limit在server端支持
