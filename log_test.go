@@ -57,6 +57,7 @@ func TestRemote(t *testing.T) {
 	// client
 	options := Options{
 		Name:         localLogClient,
+		CountLimit:   3,
 		RemoteServer: remoteLogServer,
 		Level:        LevelError,
 	}
@@ -85,6 +86,27 @@ func TestRemote(t *testing.T) {
 		t.Fatalf("query error: %v", err)
 	}
 	if len(rs) != 1 {
+		t.Fatalf("query len not match: %v", len(rs))
+	}
+	// count limit
+	logger.WithFields(Fields{"module": "my_module", "version": "my_version1"}).Errorf("error: %v", "5")
+	logger.WithFields(Fields{"module": "my_module1", "version": "my_version"}).Warnf("error: %v", "6")
+	logger.WithFields(Fields{"module": "my_module1", "version": "my_version"}).Errorf("error: %v", "7")
+	logger.WithFields(Fields{"module": "my_module", "version": "my_version1"}).Warnf("error: %v", "8")
+	// query all
+	rs, err = Query(dbname, Fields{})
+	if err != nil {
+		t.Fatalf("query error: %v", err)
+	}
+	if len(rs) != 1 {
+		t.Fatalf("query len not match: %v", len(rs))
+	}
+	// query backup
+	rs, err = Query(dbname+".bak", Fields{})
+	if err != nil {
+		t.Fatalf("query error: %v", err)
+	}
+	if len(rs) != 3 {
 		t.Fatalf("query len not match: %v", len(rs))
 	}
 }

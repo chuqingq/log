@@ -80,44 +80,16 @@ func (l *Logger) Close() {
 
 func (l *Logger) Write(p []byte) (int, error) {
 	if l.rpc != nil {
-		req := &Args{
-			Client: l.options.Name,
-			Bytes:  p,
+		req := &WriteArgs{
+			Client:     l.options.Name,
+			CountLimit: l.options.CountLimit,
+			Bytes:      p,
 		}
 		err := l.rpc.Call(l.options.RemoteServer, "LogServer.Write", req, &Reply{}) // TODO async
 		if err != nil {
 			log.Printf("rpc.Call err: %v", err)
 		}
 	}
-	// if l.options.CountLimit != 0 {
-	// 	if l.count == 0 {
-	// 		// 关闭db
-	// 		if l.db != nil {
-	// 			l.db.Close()
-	// 		}
-	// 		// backup db
-	// 		os.Rename(l.options.DB, l.options.DB+".bak")
-	// 		// reopen db
-	// 		var err error
-	// 		l.db, err = os.OpenFile(l.options.DB, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	// 		if err != nil {
-	// 			// os.Stderr.Write([]byte("open db file error"))
-	// 			return 0, err
-	// 		}
-	// 		// reset count
-	// 		l.count = l.options.CountLimit
-	// 	} else {
-	// 		l.count -= 1
-	// 	}
-	// }
-	// write
-	// if l.fifo != nil {
-	// 	l.fifo.Write(p)
-	// }
-	// if l.db != nil {
-	// 	n, err := l.db.Write(p)
-	// 	return n, err
-	// }
 	return 0, nil
 }
 
