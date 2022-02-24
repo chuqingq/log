@@ -61,8 +61,8 @@ func TestLog(t *testing.T) {
 
 # TODO
 
-[x] logondemand模式需要确保任何级别均可查看
-[x] 远程模式：区分客户端，为不同客户端保存不同日志文件
-[x] 无需写入到本地文件（暂不开放）
-[ ] 用test hook做测试
-[ ] count limit在server端支持
+- [x] logondemand模式需要确保任何级别均可查看
+- [x] 远程模式：区分客户端，为不同客户端保存不同日志文件
+- [x] 无需写入到本地文件（暂不开放此能力）
+- [ ] 用test hook做测试
+- [x] count limit在server端支持
