@@ -14,15 +14,15 @@ type fifoHook struct {
 	fifo io.WriteCloser
 }
 
-func newFifoHook(name string) *fifoHook {
+func newFifoHook(name string) (*fifoHook, error) {
 	fifo, err := logondemand.New(name + ".fifo")
 	if err != nil {
 		log.Printf("logondemand.New(%v.fifo) error: %v", name, err)
-		return nil
+		return nil, err
 	}
 	return &fifoHook{
 		fifo: fifo,
-	}
+	}, nil
 }
 
 func (f *fifoHook) Levels() []logrus.Level {
@@ -38,7 +38,7 @@ func (f *fifoHook) Fire(e *logrus.Entry) error {
 	fmt.Fprintf(os.Stderr, "fifo write: %v", string(b))
 	return nil
 }
+
 func (f *fifoHook) Close() error {
-	// return f.fifo.Close() // 如果关闭，会让读者退出，因此不关闭
-	return nil
+	return f.fifo.Close() // 关闭，会让读者退出
 }
